@@ -10,19 +10,52 @@ export default class PoemsController {
     static async Init(client: any ) {
         PoemsRepository.Init(client)
     }
+    static async CreatePoem(req: Request, res: Response):Promise<Response<ApiResponse>>{
+        let model = genAIModel()
+        let poem: string | undefined = req.body?.poem
+        if (!poem) {
+            return res.send({
+                satus: 500,
+                data: null,
+                message: "poem not found"
+            })
+        }
+        try {
+            let result = await PoemsRepository.CreatePoem(poem)
+            if (result.acknowledged) {
+                let prompt = genAIPrompt(poem)
+                let content = await model.generateContent(prompt)
+                let generated_prompt = content.response.text()
+                ImaginesRepository.CreateImagine(result.insertedId, generated_prompt)
+            }
+            return res.send({
+                status: 200, 
+                data: result,
+                message: "poem created"
+            })
+        } catch(e) {
+            // @ts-ignore
+            console.log(e.errmsg)
+            return res.send({
+                status: 500, 
+                data: null,
+                message: "poem create err"
+            })
+        }
+    }
     static async GetPoems(req: Request, res: Response):Promise<Response<ApiResponse>>{
         try {
             let poems = (await PoemsRepository.GetPoems()) as PoemExtendPrompt[]
             return res.send({
                 status: 200, 
                 data: poems,
-                message: "poems fetched successfully!"
+                message: "poems fetched"
             })
         } catch(e) {
             return res.send({
                 status: 500, 
                 data: null,
-                message: "error fetching poems!"
+                message: "poems fetch err"
             })
         }
     }
@@ -32,7 +65,7 @@ export default class PoemsController {
             return res.send({
                 satus: 500,
                 data: null,
-                message: "poem id parameter not passed"
+                message: "poem_id parameter err"
             })
         }
         try {
@@ -55,47 +88,74 @@ export default class PoemsController {
             return res.send({
                 status: 500, 
                 data: null,
-                message: "unable to fetch poem"
+                message: "poem fetch err"
             })
         }
     }
-    static async CreatePoem(req: Request, res: Response):Promise<Response<ApiResponse>>{
+    static async UpdatePoem(req: Request, res: Response){
         let model = genAIModel()
-        let poem: string | undefined = req.body?.poem
-        if (!poem) {
+        let id: string | undefined = req.body.id
+        let new_poem: string | undefined = req.body.new_poem
+        if (!id || !new_poem) {
             return res.send({
                 satus: 500,
                 data: null,
-                message: "poem not found"
+                message: "poem_id poem_content parameters err"
             })
         }
-        try {
-            let result = await PoemsRepository.CreatePoem(poem)
+        try{
+            let _id = new ObjectId(id)
+            let result = await PoemsRepository.UpdatePoem(_id, new_poem)
             if (result.acknowledged) {
-                let prompt = genAIPrompt(poem)
+                let prompt = genAIPrompt(new_poem)
                 let content = await model.generateContent(prompt)
                 let generated_prompt = content.response.text()
-                ImaginesRepository.CreateImagine(result.insertedId, generated_prompt)
+                ImaginesRepository.UpdateImagine(_id, generated_prompt)
             }
             return res.send({
                 status: 200, 
                 data: result,
-                message: "poem created successfully!"
+                message: "poem updated"
             })
         } catch(e) {
-            // @ts-ignore
-            console.log(e.errmsg)
             return res.send({
-                status: 500, 
+                satus: 500,
                 data: null,
-                message: "error creating poem!"
-            })
+                message: "update poem err..."
+            }) 
         }
     }
-    static async UpdatePoem(){
-        
-    }
-    static async DeletePoem(){
-        
+    static async DeletePoem(req: Request, res: Response){
+        let id = req.params.id
+        if (!id) {
+            return res.send({
+                satus: 500,
+                data: null,
+                message: "poem_id parameter err"
+            })
+        }
+        try {
+            let _id = new ObjectId(id)
+            let result = await PoemsRepository.DeletePoem(_id)
+            if (result?.acknowledged) {
+                return res.send({
+                    status: 200, 
+                    data: result,
+                    message: "poem deleted"
+                })
+            } else {
+                return res.send({
+                    satus: 500,
+                    data: null,
+                    message: "poem exec delete err"
+                })   
+            }
+        } catch(e) {
+            return res.send({
+                satus: 500,
+                data: null,
+                message: "poem delete err"
+            })
+        }
     }
 }
