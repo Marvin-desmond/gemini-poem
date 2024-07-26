@@ -4,8 +4,10 @@ import PoemsController from "../Controller/PoemsController"
 const router = express.Router()
 
 router.post("/create", PoemsController.CreatePoem)
+router.put("/update/:id", PoemsController.UpdatePoem)
 router.get("/get/:id", PoemsController.GetPoem)
 router.get("/", PoemsController.GetPoems)
+router.delete("/delete/:id", PoemsController.DeletePoem)
 
 export default router 
 
