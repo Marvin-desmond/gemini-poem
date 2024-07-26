@@ -32,15 +32,22 @@ export default class ImaginesRepository {
               },
               options = { upsert: true };
         const result = await this.imagines!.updateOne(filter, update_doc, options)
-        console.log(
-            `${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount} document(s)`,
-          )
         return result
     }
-    static async UpdatePoem(){
-        
+    static async UpdateImagine(poem_id: ObjectId, generated_prompt: string){
+        const filter = { poem_id : poem_id },
+              update_doc = {
+                $set: {
+                    last_modified: new Date(),
+                    imagine_prompt: generated_prompt
+                }
+              },
+              options = { upsert: true };
+        const result = await this.imagines!.updateOne(filter, update_doc, options)
+        return result
     }
-    static async DeletePoem(){
-        
+    static async DeleteImagine(poem_id: ObjectId){
+        let result = this.imagines!.deleteMany({ poem_id: poem_id })
+        return result
     }
 }

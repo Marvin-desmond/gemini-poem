@@ -1,6 +1,8 @@
 import { ObjectId, Collection } from "mongodb"
 import { Poem, PoemExtendPrompt } from "../../types"
 
+import ImaginesRepository from "./ImaginesRepository"
+
 export default class PoemsRepository {
     static poems?: Collection;
     static async Init(client: any ) {
@@ -24,12 +26,24 @@ export default class PoemsRepository {
                   as: "joins"
                 }
             },
+            // {
+            //     // $unwind: "$joins"
+            //     $unwind: {
+            //         path: "$joins",
+            //         preserveNullAndEmptyArrays: true
+            //     }
+            // },
             {
-                $addFields: { imagine_prompt: "$joins.imagine_prompt" }
+                $addFields: { 
+                    imagine_prompt: "$joins.imagine_prompt",
+                    last_modified: "$joins.last_modified"
+                }
             },
             {
-                $unset: "joins"
-            }
+                $project: {
+                    joins: 0
+                }
+            } // { $unset: "joins" }
         ])).toArray()) as PoemExtendPrompt[]
         return poems
     }
@@ -39,15 +53,26 @@ export default class PoemsRepository {
     }
     static async CreatePoem(poem: string){
         let result = await this.poems!.insertOne({ 
-            _id: new ObjectId("507f191e810c19729de860ea"), 
+            // _id: new ObjectId("507f191e810c19729de860ea"), 
             poem: poem 
         })
         return result
     }
-    static async UpdatePoem(){
-        
+    static async UpdatePoem(_id: ObjectId, poem: string){
+        const filter = { _id: _id},
+        update_doc = {
+          $set: {
+              poem: poem
+          }
+        }
+        const result = await this.poems!.updateOne(filter, update_doc)
+        return result
     }
-    static async DeletePoem(){
-        
+    static async DeletePoem(poem_id: ObjectId){
+        let result = await this.poems?.deleteOne({ _id: poem_id })
+        if (result?.acknowledged && result.deletedCount == 1) {
+            ImaginesRepository.DeleteImagine(poem_id)
+        }
+        return result
     }
 }
