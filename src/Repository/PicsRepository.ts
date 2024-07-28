@@ -28,16 +28,19 @@ export default class PicsRepository {
         } else {
             throw new Error(`error generating buffer`)
         }
-        const stream = new Readable()
+        const stream = new Readable({
+            read() {
+                this.push(buffer);
+                this.push(null);
+            }
+        })
         const upload_stream = this.bucket!.openUploadStream(`${stream_file_name}.png`)
-        stream.push(buffer)
-        stream.push(null)
-        stream.pipe(upload_stream).on('error', (error) => {
-        assert.ifError(error)
-        }).on('finish', () => {
+        await pipeline(
+            stream,
+            upload_stream
+        )
         result.file_id = upload_stream.id
         result.done = true
-        })
         return result
     }
 
@@ -61,15 +64,6 @@ export default class PicsRepository {
         )
         result.done = true;
         result.buffer = Buffer.concat(buffers)
-        // this.bucket!.openDownloadStream(file_id).
-        // pipe(bufferStream).
-        // on('error', (error) => {
-        //     assert.ifError(error);
-        // }).
-        // on('finish', () => {
-        //     result.done = true
-        //     result.buffer = Buffer.concat(buffers) 
-        // })
         return result
     }
 
