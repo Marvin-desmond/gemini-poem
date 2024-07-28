@@ -37,3 +37,9 @@ export interface ApiResponse {
     data: any
     message: string
 }
+
+export interface UploadResponse {
+    done: boolean
+    file_id?: ObjectId
+    buffer?: Buffer | string
+}
