@@ -4,12 +4,15 @@ import { ENVS } from "../envs"
 
 import PoemsController from "./Controller/PoemsController"
 import ImaginesController from "./Controller/ImaginesController"
+import PicsController from "./Controller/PicsController"
+
 
 connection().then(async client => {
   try {
     let _client = client.db(ENVS.DB_NAME)
     PoemsController.Init(_client)
     ImaginesController.Init(_client)
+    PicsController.Init(_client)
     app.listen(ENVS.PORT, () => {
       console.log(`app listening on PORT ${ENVS.PORT}`)
     })

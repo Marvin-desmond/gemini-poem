@@ -4,6 +4,7 @@ import morgan from "morgan"
 
 import poems from "./Routes/poems"
 import imagines from "./Routes/imagines"
+import pics from "./Routes/pics"
 
 const app = express()
 
@@ -12,6 +13,7 @@ app.use(morgan("dev"))
 app.use(express.json())
 app.use("/api/poems", poems)
 app.use("/api/imagines", imagines)
+app.use("/api/pics", pics)
 app.use(express.static('public'))
 
 app.use("/", express.static("build"))
