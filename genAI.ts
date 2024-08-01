@@ -25,5 +25,16 @@ const genAIPrompt = (poem: string) => {
     }`;
     return prompt
 }
-export { genAIModel, genAIPrompt }
+
+const generatePrompt = async (poem: string): Promise<string> => {
+  const model = genAIModel();
+  let prompt = genAIPrompt(poem);
+
+  const content = await model.generateContent(prompt)
+  let generated_prompt = content.response.text()
+  // remove prefix {\"text_prompt\": \" and postfix "\"}\n"
+  generated_prompt = generated_prompt.slice(17, -3)
+  return generated_prompt
+}
+export { generatePrompt }
 
