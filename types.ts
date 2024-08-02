@@ -39,7 +39,13 @@ export interface ApiResponse {
 }
 
 export interface UploadResponse {
-    done: boolean
+    stream_done: boolean
+    meta_done: boolean
     file_id?: ObjectId
     buffer?: Buffer | string
+}
+
+export interface PicMeta {
+    file_id: ObjectId 
+    poem_id: ObjectId 
 }
