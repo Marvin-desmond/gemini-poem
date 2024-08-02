@@ -43,13 +43,45 @@ export default class PoemsRepository {
                 $project: {
                     joins: 0
                 }
-            } // { $unset: "joins" }
+            }, // { $unset: "joins" }
+            {
+                $lookup:
+                {
+                  from: "picsMeta",
+                  localField: "_id",
+                  foreignField: "poem_id",
+                  as: "meta"
+                }
+            },
+            {
+                $addFields: { 
+                    file_id: "$meta.file_id",
+                }
+            },
+            { $unset: "meta" }
         ])).toArray()) as PoemExtendPrompt[]
         return poems
     }
-    static async GetPoem(_id: ObjectId):Promise<Poem>{
-        let poem = (await this.poems!.findOne({ _id: _id })) as Poem
-        return poem
+    static async GetPoem(_id: ObjectId):Promise<PoemExtendPrompt>{
+        let poem_aggregate = (await (this.poems!.aggregate([
+            { $match: {_id: _id } },
+            {
+                $lookup:
+                {
+                  from: "imagines",
+                  localField: "_id",
+                  foreignField: "poem_id",
+                  as: "joins"
+                }
+            },
+            {
+                $addFields: { 
+                    imagine_prompt: "$joins.imagine_prompt",
+                    last_modified: "$joins.last_modified"
+                }
+            },
+            { $unset: "joins" }])).toArray()) as PoemExtendPrompt[];
+        return poem_aggregate[0];
     }
     static async CreatePoem(poem: string){
         let result = await this.poems!.insertOne({ 
