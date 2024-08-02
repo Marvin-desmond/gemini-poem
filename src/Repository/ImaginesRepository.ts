@@ -47,7 +47,7 @@ export default class ImaginesRepository {
         return result
     }
     static async DeleteImagine(poem_id: ObjectId){
-        let result = this.imagines!.deleteMany({ poem_id: poem_id })
+        let result = await this.imagines!.deleteMany({ poem_id: poem_id })
         return result
     }
 }
