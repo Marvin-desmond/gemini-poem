@@ -4,28 +4,25 @@ import { ObjectId } from "mongodb"
 
 import PoemsRepository from "../Repository/PoemsRepository"
 import ImaginesRepository from "../Repository/ImaginesRepository"
-import { genAIModel, genAIPrompt } from "../../genAI"
+import { generatePrompt } from "../../genAI"
 
 export default class PoemsController {
     static async Init(client: any ) {
         PoemsRepository.Init(client)
     }
     static async CreatePoem(req: Request, res: Response):Promise<Response<ApiResponse>>{
-        let model = genAIModel()
         let poem: string | undefined = req.body?.poem
         if (!poem) {
             return res.send({
-                satus: 500,
+                status: 500,
                 data: null,
-                message: "poem not found"
+                message: "poem parameter err"
             })
         }
         try {
             let result = await PoemsRepository.CreatePoem(poem)
             if (result.acknowledged) {
-                let prompt = genAIPrompt(poem)
-                let content = await model.generateContent(prompt)
-                let generated_prompt = content.response.text()
+                let generated_prompt = await generatePrompt(poem);
                 ImaginesRepository.CreateImagine(result.insertedId, generated_prompt)
             }
             return res.send({
@@ -63,7 +60,7 @@ export default class PoemsController {
         let id = req.params.id
         if (!id) {
             return res.send({
-                satus: 500,
+                status: 500,
                 data: null,
                 message: "poem_id parameter err"
             })
@@ -93,12 +90,11 @@ export default class PoemsController {
         }
     }
     static async UpdatePoem(req: Request, res: Response){
-        let model = genAIModel()
         let id: string | undefined = req.body.id
         let new_poem: string | undefined = req.body.new_poem
         if (!id || !new_poem) {
             return res.send({
-                satus: 500,
+                status: 500,
                 data: null,
                 message: "poem_id poem_content parameters err"
             })
@@ -107,9 +103,7 @@ export default class PoemsController {
             let _id = new ObjectId(id)
             let result = await PoemsRepository.UpdatePoem(_id, new_poem)
             if (result.acknowledged) {
-                let prompt = genAIPrompt(new_poem)
-                let content = await model.generateContent(prompt)
-                let generated_prompt = content.response.text()
+                let generated_prompt = await generatePrompt(new_poem)
                 ImaginesRepository.UpdateImagine(_id, generated_prompt)
             }
             return res.send({
@@ -119,7 +113,7 @@ export default class PoemsController {
             })
         } catch(e) {
             return res.send({
-                satus: 500,
+                status: 500,
                 data: null,
                 message: "update poem err..."
             }) 
@@ -129,7 +123,7 @@ export default class PoemsController {
         let id = req.params.id
         if (!id) {
             return res.send({
-                satus: 500,
+                status: 500,
                 data: null,
                 message: "poem_id parameter err"
             })
@@ -145,14 +139,14 @@ export default class PoemsController {
                 })
             } else {
                 return res.send({
-                    satus: 500,
+                    status: 500,
                     data: null,
                     message: "poem exec delete err"
                 })   
             }
         } catch(e) {
             return res.send({
-                satus: 500,
+                status: 500,
                 data: null,
                 message: "poem delete err"
             })
