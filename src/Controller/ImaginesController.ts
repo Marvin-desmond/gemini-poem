@@ -3,7 +3,7 @@ import { ApiResponse, Imagine } from "../../types"
 import { ObjectId, Collection } from "mongodb"
 
 import ImaginesRepository from "../Repository/ImaginesRepository"
-import { genAIModel, genAIPrompt } from "../../genAI"
+import { generatePrompt } from "../../genAI"
 import PoemsRepository from "../Repository/PoemsRepository"
 export default class ImaginesController {
     static imagines: Collection;
@@ -15,13 +15,12 @@ export default class ImaginesController {
             let id: string | undefined = req.params.id
             if (!id) {
                 return res.send({
-                    satus: 500,
+                    status: 500,
                     data: null,
                     message: "poem id parameter not passed"
                 })
             }
             let _id = new ObjectId(id)
-            let model = genAIModel()
             let result = await PoemsRepository.GetPoem(_id)
             if (!result) {
                 return res.send({
@@ -30,10 +29,8 @@ export default class ImaginesController {
                     message: "poem not found"
                 })
             }
-            let prompt = genAIPrompt(result.poem),
-                content = await model.generateContent(prompt),
-                generated_prompt = content.response.text();
-                await ImaginesRepository.CreateImagine(_id, generated_prompt)
+            let generated_prompt = await generatePrompt(result.poem)
+            await ImaginesRepository.CreateImagine(_id, generated_prompt)
             return res.send({
                 status: 200, 
                 data: `${generated_prompt}<EOS>`,
@@ -68,13 +65,12 @@ export default class ImaginesController {
             let id: string | undefined = req.params.id
             if (!id) {
                 return res.send({
-                    satus: 500,
+                    status: 500,
                     data: null,
                     message: "poem id parameter not passed"
                 })
             }
             let _id = new ObjectId(id)
-            let model = genAIModel()
             let result = await PoemsRepository.GetPoem(_id)
             if (!result) {
                 return res.send({
@@ -83,9 +79,7 @@ export default class ImaginesController {
                     message: "poem not found"
                 })
             }
-            let prompt = genAIPrompt(result.poem),
-                content = await model.generateContent(prompt),
-                generated_prompt = content.response.text();
+            let generated_prompt = await generatePrompt(result.poem)
             let result_imagine = await ImaginesRepository.UpdateImagine(_id, generated_prompt)
             return res.send({
                 status: 200, 
@@ -102,4 +96,38 @@ export default class ImaginesController {
             })
         }
   }
+
+  static async DeleteImagine(req: Request, res: Response){
+    let _poem_id: string | undefined = req.params.id
+    if (!_poem_id) {
+        return res.send({
+            status: 500,
+            data: null,
+            message: "poem_id parameter err"
+        })
+    }
+    try {
+        let _id = new ObjectId(_poem_id)
+        let result = await ImaginesRepository.DeleteImagine(_id)
+        if (result?.acknowledged) {
+            return res.send({
+                status: 200, 
+                data: result,
+                message: "imagine deleted"
+            })
+        } else {
+            return res.send({
+                status: 500,
+                data: null,
+                message: "imagine exec delete err"
+            })   
+        }
+    } catch(e) {
+        return res.send({
+            status: 500,
+            data: null,
+            message: "imagine delete err"
+        })
+    }
+}
 }
