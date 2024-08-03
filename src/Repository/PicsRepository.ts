@@ -133,6 +133,7 @@ export default class PicsRepository {
         return result
     }
     static async DeletePic(file_id: ObjectId):Promise<void>{
+        await this.picsMeta?.deleteOne({ file_id: file_id })
         await this.bucket!.delete(file_id)
     }
 }
