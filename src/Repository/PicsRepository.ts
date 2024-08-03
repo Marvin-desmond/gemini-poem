@@ -50,11 +50,20 @@ export default class PicsRepository {
         )
         result.file_id = upload_stream.id
         result.stream_done = true
-        let result_meta_save = await this.picsMeta!.insertOne({ 
-            poem_id: poem_id,
-            file_id: result.file_id
-        })
+        let result_meta_save = await this.CreatePicMeta(poem_id,result.file_id)
         result.meta_done = result_meta_save.acknowledged
+        return result
+    }
+
+    static async CreatePicMeta(poem_id: ObjectId, file_id: ObjectId){
+        const filter = { poem_id : poem_id },
+              update_doc = {
+                $set: {
+                    file_id: file_id 
+                }
+              },
+              options = { upsert: true };
+        const result = await this.picsMeta!.updateOne(filter, update_doc, options)
         return result
     }
 
