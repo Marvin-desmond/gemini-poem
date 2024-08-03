@@ -2,6 +2,7 @@ import { ObjectId, Collection } from "mongodb"
 import { Poem, PoemExtendPrompt } from "../../types"
 
 import ImaginesRepository from "./ImaginesRepository"
+import PicsRepository from "./PicsRepository"
 
 export default class PoemsRepository {
     static poems?: Collection;
@@ -103,7 +104,9 @@ export default class PoemsRepository {
     static async DeletePoem(poem_id: ObjectId){
         let result = await this.poems?.deleteOne({ _id: poem_id })
         if (result?.acknowledged && result.deletedCount == 1) {
+            let meta_result = await PicsRepository.GetPicMeta(poem_id)
             ImaginesRepository.DeleteImagine(poem_id)
+            PicsRepository.DeletePic(meta_result.file_id)
         }
         return result
     }
