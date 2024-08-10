@@ -1,4 +1,5 @@
 import {GoogleGenerativeAI } from "@google/generative-ai"
+
 import { ENVS } from "./envs"
 
 const genAIModel = () =>{
@@ -26,6 +27,17 @@ const genAIPrompt = (poem: string) => {
     return prompt
 }
 
+const preprocessFile = (buffer: Buffer, mimeType: string) => {
+    console.log(buffer.length)
+    console.log(mimeType)
+    return {
+      inlineData: {
+        data: Buffer.from(buffer).toString("base64"),
+        mimeType
+      },
+    };
+}
+
 const generatePrompt = async (poem: string): Promise<string> => {
   const model = genAIModel();
   let prompt = genAIPrompt(poem);
@@ -36,5 +48,13 @@ const generatePrompt = async (poem: string): Promise<string> => {
   generated_prompt = generated_prompt.slice(17, -3)
   return generated_prompt
 }
-export { generatePrompt }
 
+const generateFilePrompt = async (buffer: Buffer): Promise<string> => {
+  const model = genAIModel()
+  const fPart = preprocessFile(buffer, "image/png")
+  const resp = await model.generateContent([{text: "OCR this image"}, fPart])
+  let generated_poem = resp.response.text()
+  return generated_poem
+}
+
+export { generatePrompt, generateFilePrompt }
