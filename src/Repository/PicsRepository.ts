@@ -132,6 +132,11 @@ export default class PicsRepository {
         result.stream_done = true
         return result
     }
+
+    static async CheckPicExists(fileId: ObjectId):Promise<number> {
+        let count = await this.bucket!.find({ "_id": fileId }).count()
+        return count
+    }
     static async DeletePic(file_id: ObjectId):Promise<void>{
         await this.picsMeta?.deleteOne({ file_id: file_id })
         await this.bucket!.delete(file_id)
