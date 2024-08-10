@@ -9,8 +9,6 @@ import PicsController from "./Controller/PicsController"
 
 connection().then(async client => {
   try {
-    console.log("ALL ENVIRONMENT VARIABLES");
-    console.log(ENVS)
     let _client = client.db(ENVS.DB_NAME)
     PoemsController.Init(_client)
     ImaginesController.Init(_client)
