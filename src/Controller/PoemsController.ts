@@ -1,10 +1,10 @@
 import { Request, Response } from "express"
-import { ApiResponse, Poem, PoemExtendPrompt } from "../../types"
+import { ApiResponse, PoemExtendPrompt } from "../../types"
 import { ObjectId } from "mongodb"
 
 import PoemsRepository from "../Repository/PoemsRepository"
 import ImaginesRepository from "../Repository/ImaginesRepository"
-import { generatePrompt } from "../../genAI"
+import { generatePrompt, generateFilePrompt } from "../../genAI"
 
 export default class PoemsController {
     static async Init(client: any ) {
@@ -151,5 +151,18 @@ export default class PoemsController {
                 message: "poem delete err"
             })
         }
+    }
+    static async PoemFromFile(req: Request, res: Response) {
+        const file = req.file
+        if (!file || !file.buffer) {
+            return res.send({
+                status: 500,
+                data: null,
+                message: "buffer not found"
+            })
+        }
+        const resp = await generateFilePrompt(file?.buffer)
+        const poem_text = Object.values(JSON.parse(resp))[0]
+        return res.send(poem_text)
     }
 }
