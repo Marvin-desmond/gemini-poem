@@ -3,7 +3,7 @@ import { ApiResponse, Imagine } from "../types"
 import { ObjectId, Collection } from "mongodb"
 
 import ImaginesRepository from "../Repository/ImaginesRepository"
-import { generatePrompt } from "../../genAI"
+import { generatePrompt } from "../genAI"
 import PoemsRepository from "../Repository/PoemsRepository"
 export default class ImaginesController {
     static imagines: Collection;

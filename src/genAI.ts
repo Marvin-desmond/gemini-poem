@@ -1,6 +1,6 @@
 import {GoogleGenerativeAI } from "@google/generative-ai"
 
-import { ENVS } from "./src/envs"
+import { ENVS } from "./envs"
 
 const genAIModel = () =>{
     const genAI = new GoogleGenerativeAI(ENVS.GEMINI_API_KEY!)

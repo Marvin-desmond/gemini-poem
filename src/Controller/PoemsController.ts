@@ -4,7 +4,7 @@ import { ObjectId } from "mongodb"
 
 import PoemsRepository from "../Repository/PoemsRepository"
 import ImaginesRepository from "../Repository/ImaginesRepository"
-import { generatePrompt, generateFilePrompt } from "../../genAI"
+import { generatePrompt, generateFilePrompt } from "../genAI"
 
 export default class PoemsController {
     static async Init(client: any ) {
