@@ -106,7 +106,8 @@ export default class PoemsRepository {
         if (result?.acknowledged && result.deletedCount == 1) {
             let meta_result = await PicsRepository.GetPicMeta(poem_id)
             ImaginesRepository.DeleteImagine(poem_id)
-            PicsRepository.DeletePic(meta_result.file_id)
+            if (await PicsRepository.CheckPicExists(meta_result.file_id) == 1)
+                PicsRepository.DeletePic(meta_result.file_id)
         }
         return result
     }
