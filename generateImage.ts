@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from "axios";
 import FormData from "form-data"
-import { ENVS } from "./envs"
+import { ENVS } from "./src/envs"
 
 const stableTextToImagePayload = (prompt: string): any => {
   return {

@@ -1,5 +1,5 @@
 import { MongoClient } from "mongodb"
-import { ENVS } from "./envs"
+import { ENVS } from "./src/envs"
 
 const mongoConnection = () => {
     const mongoClient = new MongoClient(ENVS.MONGODB_URI!)
