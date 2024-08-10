@@ -1,5 +1,5 @@
 import app from "./server"
-import connection from "../db"
+import connection from "./db"
 import { ENVS } from "./envs"
 
 import PoemsController from "./Controller/PoemsController"
