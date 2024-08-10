@@ -1,5 +1,5 @@
 import { Request, Response } from "express"
-import { ApiResponse, PoemExtendPrompt } from "../../types"
+import { ApiResponse, PoemExtendPrompt } from "../types"
 import { ObjectId } from "mongodb"
 
 import PoemsRepository from "../Repository/PoemsRepository"

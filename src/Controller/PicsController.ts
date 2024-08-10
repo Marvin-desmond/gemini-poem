@@ -1,5 +1,5 @@
 import { Request, Response } from "express"
-import { ApiResponse, PicMeta, UploadResponse } from "../../types"
+import { ApiResponse, PicMeta, UploadResponse } from "../types"
 import { ObjectId } from "mongodb"
 import fs from "fs"
 

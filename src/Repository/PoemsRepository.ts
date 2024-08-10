@@ -1,5 +1,5 @@
 import { ObjectId, Collection } from "mongodb"
-import { Poem, PoemExtendPrompt } from "../../types"
+import { Poem, PoemExtendPrompt } from "../types"
 
 import ImaginesRepository from "./ImaginesRepository"
 import PicsRepository from "./PicsRepository"

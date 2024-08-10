@@ -1,5 +1,5 @@
 import { ObjectId, Collection } from "mongodb"
-import { Imagine } from "../../types"
+import { Imagine } from "../types"
 
 export default class ImaginesRepository {
     static imagines?: Collection;

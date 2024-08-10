@@ -1,5 +1,5 @@
 import { Request, Response } from "express"
-import { ApiResponse, Imagine } from "../../types"
+import { ApiResponse, Imagine } from "../types"
 import { ObjectId, Collection } from "mongodb"
 
 import ImaginesRepository from "../Repository/ImaginesRepository"

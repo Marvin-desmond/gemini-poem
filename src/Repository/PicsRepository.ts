@@ -3,7 +3,7 @@ import { Readable, Writable } from "node:stream"
 import { pipeline } from 'node:stream/promises'
 import assert from 'assert'
 
-import { PicMeta, UploadResponse } from "../../types"
+import { PicMeta, UploadResponse } from "../types"
 import { stableImage } from "../../generateImage"
 import { generateSlug } from "random-word-slugs"
 
